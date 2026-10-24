@@ -1,0 +1,16 @@
+{
+  "name": "N2 计划",
+  "short_name": "N2",
+  "description": "日语 N2 学习计划：课表排程、单词打卡、进步曲线",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f3f0",
+  "theme_color": "#f5f3f0",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

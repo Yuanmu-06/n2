@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="N2计划">
+<meta name="theme-color" content="#f5f3f0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>N2 计划</title>
+<style>
+  :root{
+    --accent:#d9484d; --ink:#1c1f26; --sub:#70757d; --bg:#f5f3f0; --card:#fff;
+    --blue:#2a66b3; --green:#21856a; --amber:#d18714; --purple:#6b4d9e;
+    --line:#ecebe8;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom));}
+  header{position:sticky;top:0;z-index:10;background:rgba(245,243,240,.94);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    padding:calc(8px + env(safe-area-inset-top)) 16px 8px;border-bottom:1px solid var(--line);}
+  header h1{margin:0;font-size:17px;font-weight:600;text-align:center;line-height:1.3;}
+  header .sub{font-size:11px;color:var(--sub);text-align:center;}
+  main{padding:14px 14px 8px;}
+  .card{background:var(--card);border-radius:16px;padding:15px;margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .card h2{margin:0 0 3px;font-size:15px;font-weight:600;}
+  .card .cap{font-size:11px;color:var(--sub);margin-bottom:10px;}
+  .row{display:flex;align-items:center;gap:8px;}
+  .between{justify-content:space-between;}
+  .big{font-size:30px;font-weight:700;letter-spacing:-.5px;}
+  .muted{color:var(--sub);}
+  .small{font-size:12px;}
+  .tiny{font-size:11px;}
+  .bar{height:7px;border-radius:4px;background:#eeede9;overflow:hidden;margin:9px 0;}
+  .pbar{height:13px;border-radius:8px;background:#eae8e3;overflow:hidden;margin:12px 0 10px;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.07);}
+  .pbar > i{display:block;height:100%;border-radius:8px;
+    background:linear-gradient(90deg,#ef8b8e,#d9484d 70%,#c93b40);
+    transition:width .45s cubic-bezier(.4,0,.2,1);}
+  .pace{font-size:14px;line-height:1.5;font-weight:500;color:var(--ink);}
+  .pace b{color:var(--accent);font-size:26px;font-weight:700;margin:0 2px;letter-spacing:-1px;
+    font-feature-settings:'tnum';}
+  .pace-sub{font-size:11px;color:var(--sub);margin-top:3px;}
+  .bar > i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .25s;}
+  .metrics{display:flex;gap:8px;}
+  .metric{flex:1;min-width:0;}
+  .metric .k{font-size:10px;color:var(--sub);}
+  .metric .v{font-size:13px;font-weight:600;}
+  button{font-family:inherit;font-size:14px;border:none;border-radius:10px;padding:10px 12px;
+    background:#eeede9;color:var(--ink);font-weight:500;}
+  button.primary{background:var(--accent);color:#fff;}
+  button.ghost{background:transparent;color:var(--accent);font-weight:600;}
+  button.wide{width:100%;}
+  button.sm{padding:6px 10px;font-size:12px;border-radius:8px;}
+  .btnrow{display:flex;gap:8px;margin-top:11px;}
+  .btnrow > button{flex:1;}
+  .tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap;}
+  .task{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);}
+  .task:last-child{border-bottom:none;}
+  .task .ck{width:22px;height:22px;border-radius:50%;border:1.5px solid #cfcec9;flex:0 0 22px;
+    display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;margin-top:1px;}
+  .task.done .ck{background:var(--green);border-color:var(--green);}
+  .task.done .tt{text-decoration:line-through;color:var(--sub);}
+  .task .tt{font-size:14px;font-weight:500;}
+  .task .td{font-size:11px;color:var(--sub);margin-top:1px;}
+  .task .tr{text-align:right;flex:0 0 auto;}
+  .task .time{font-size:11px;font-weight:600;}
+  .lines{display:flex;gap:8px;align-items:center;padding:5px 0;font-size:12px;}
+  .lines .w{width:86px;flex:0 0 86px;font-variant-numeric:tabular-nums;color:var(--ink);}
+  .days{display:flex;gap:5px;}
+  .days button{flex:1;padding:8px 0;border-radius:10px;background:var(--card);color:var(--ink);
+    font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:1px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .days button.on{background:var(--accent);color:#fff;}
+  .days button .d{font-size:9px;font-weight:400;opacity:.75;}
+  .course{padding:9px 0;border-bottom:1px solid var(--line);}
+  .course:last-child{border-bottom:none;}
+  .course .n{font-size:14px;font-weight:500;}
+  .course .i{font-size:11px;color:var(--sub);margin-top:2px;}
+  .busy{background:#eef3fb;border-radius:9px;padding:9px 10px;margin-bottom:7px;}
+  .busy .t{font-size:11px;color:var(--blue);font-weight:600;}
+  .busy .n{font-size:13px;font-weight:500;margin-top:1px;}
+  .busy .i{font-size:11px;color:var(--sub);margin-top:1px;}
+  .bars{display:flex;align-items:flex-end;gap:2px;height:110px;margin-top:8px;}
+  .bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;}
+  .bars .b i{display:block;border-radius:2px;min-height:2px;}
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
+    background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
+  nav button{flex:1;background:transparent;border-radius:0;padding:9px 0 8px;color:var(--sub);
+    font-size:10px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  nav button.on{color:var(--accent);}
+  nav button span{font-size:19px;line-height:1;}
+  #modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.35);
+    align-items:flex-end;justify-content:center;}
+  .sheet{background:var(--bg);width:100%;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom));animation:up .22s ease;}
+  @keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+  .sheet h3{margin:0 0 12px;font-size:16px;}
+  .field{margin-bottom:11px;}
+  .field label{display:block;font-size:11px;color:var(--sub);margin-bottom:4px;}
+  .field input,.field select,.field textarea{width:100%;font-family:inherit;font-size:15px;color:var(--ink);
+    background:#fff;border:1px solid #e2e1dc;border-radius:10px;padding:10px;}
+  .field textarea{min-height:62px;resize:vertical;}
+  .field .two{display:flex;gap:8px;}
+  .field .two > *{flex:1;}
+  .chips{display:flex;gap:5px;}
+  .chips button{flex:1;padding:8px 0;font-size:12px;background:#fff;border:1px solid #e2e1dc;}
+  .chips button.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .hint{font-size:11px;color:var(--sub);line-height:1.55;margin-top:6px;}
+  .warn{font-size:11px;color:var(--amber);line-height:1.5;}
+  .empty{font-size:12px;color:var(--sub);padding:6px 0;}
+  .sep{height:1px;background:var(--line);margin:10px 0;}
+  details.sum{background:var(--card);border-radius:14px;padding:13px 15px;margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  details.sum > summary{font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;list-style:none;}
+  details.sum > summary::-webkit-details-marker{display:none;}
+  details.sum > summary::after{content:' ›';float:right;color:var(--sub);}
+  details.sum[open] > summary::after{content:' ˅';}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">今日</h1>
+  <div class="sub" id="subtitle"></div>
+</header>
+<main id="view"></main>
+<nav>
+  <button id="tab-today" onclick="setTab('today')"><span>☀︎</span>今日</button>
+  <button id="tab-schedule" onclick="setTab('schedule')"><span>▦</span>课表</button>
+  <button id="tab-stats" onclick="setTab('stats')"><span>▤</span>进度</button>
+  <button id="tab-settings" onclick="setTab('settings')"><span>⚙︎</span>设置</button>
+</nav>
+<div id="modal"></div>
+
+<script>
+// ======================= LOGIC =======================
+const LS_KEY = 'n2planner.v1';
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function dateKey(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function parseKey(k){ const p = String(k).split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); }
+function startOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function addDays(d,n){ const x = startOfDay(d); x.setDate(x.getDate()+n); return x; }
+function daysBetween(a,b){ return Math.round((startOfDay(b)-startOfDay(a))/86400000); }
+function weekdayOf(d){ return (d.getDay()+6)%7+1; }
+function minsText(m){ m = Math.max(0, Math.min(m, 1440)); return pad2(Math.floor(m/60))+':'+pad2(m%60); }
+function durText(m){
+  if (m >= 60) { const h = Math.floor(m/60), r = m%60; return r ? h+'小时'+r+'分' : h+'小时'; }
+  return m+'分钟';
+}
+function esc(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function uid(){ return 'id' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+
+const WD_NAME = ['周一','周二','周三','周四','周五','周六','周日'];
+const WD_SHORT = ['一','二','三','四','五','六','日'];
+
+// ---- 初始数据 ----
+function seed(){
+  return {
+    version:1,
+    settings:{
+      startDate:'2026-10-24', examDate:'2027-07-04', wordDeadline:'2027-05-31',
+      totalWords:4461, dailyNew:30, reviewFactor:4, icsAlarm:true, freeDayStart:630, latestEnd:1350, minWindow:45,
+      digestEnabled:true, digestHour:19, digestMinute:0
+    },
+    profiles:[
+      { id:'p2', name:'第②套（11月8日前）', startDate:'2026-09-01',
+        slots:[[510,550],[560,600],[630,670],[680,720],[870,910],[920,960],[970,1010],[1020,1060],[1140,1180],[1190,1230]] },
+      { id:'p1', name:'第①套（11月9日起）', startDate:'2026-11-09',
+        slots:[[500,540],[550,590],[610,650],[660,700],[870,910],[920,960],[970,1010],[1020,1060],[1140,1180],[1190,1230]] }
+    ],
+    courses:[
+      { id:'c1',  name:'鸿蒙应用开发语言基础', wd:1, s:5, e:6, loc:'信息楼北407（安全仿真实训室）', teacher:'陈峰震' },
+      { id:'c2',  name:'大学生体育与健康3（足球·男）', wd:1, s:7, e:8, loc:'足球场', teacher:'方镇' },
+      { id:'c3',  name:'软件测试技术', wd:2, s:1, e:2, loc:'信息楼北410（安全仿真实训室）', teacher:'范骋宇' },
+      { id:'c4',  name:'Java EE 企业级应用开发', wd:3, s:1, e:2, loc:'物智实验室（一）（北309）', teacher:'曾玮' },
+      { id:'c5',  name:'鸿蒙应用开发语言基础', wd:3, s:3, e:4, loc:'信息楼北407（安全仿真实训室）', teacher:'陈峰震' },
+      { id:'c6',  name:'操作系统管理与应用', wd:3, s:7, e:8, loc:'信息楼北407（安全仿真实训室）', teacher:'范骋宇' },
+      { id:'c7',  name:'微服务架构开发（SpringCloud）', wd:3, s:9, e:10, loc:'网络综合实训室（信息楼南306）', teacher:'曾玮' },
+      { id:'c8',  name:'Java EE 企业级应用开发', wd:4, s:1, e:2, loc:'物联网实训室（信息楼南304）', teacher:'曾玮' },
+      { id:'c9',  name:'操作系统管理与应用', wd:4, s:3, e:4, loc:'信息楼北407（安全仿真实训室）', teacher:'范骋宇' },
+      { id:'c10', name:'微服务架构开发（SpringCloud）', wd:5, s:3, e:4, loc:'信息楼北410（安全仿真实训室）', teacher:'曾玮' }
+    ],
+    records:{},
+    reminders:[
+      { id:'r1', title:'今天背单词了吗', body:'开 App 打卡，填一下今天实际背了多少新词。',
+        hour:21, minute:30, days:[1,2,3,4,5,6,7], enabled:true },
+      { id:'r2', title:'周日复盘', body:'N3 查漏 90 分钟：词汇抽查 30 + 语法抽查 30 + 本周错题 30。',
+        hour:15, minute:0, days:[7], enabled:true }
+    ]
+  };
+}
+
+var DB = loadDB();
+
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return seed();
+    const obj = JSON.parse(raw);
+    const base = seed();
+    if (!obj || typeof obj !== 'object') return base;
+    // 缺字段就用默认值补，避免旧数据打不开
+    return {
+      version: 1,
+      settings: Object.assign({}, base.settings, obj.settings || {}),
+      profiles: Array.isArray(obj.profiles) && obj.profiles.length ? obj.profiles : base.profiles,
+      courses: Array.isArray(obj.courses) ? obj.courses : base.courses,
+      records: (obj.records && typeof obj.records === 'object') ? obj.records : {},
+      reminders: Array.isArray(obj.reminders) ? obj.reminders : base.reminders
+    };
+  }catch(e){ return seed(); }
+}
+
+function saveDB(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){ /* 隐私模式可能失败，忽略 */ }
+}
+
+// ---- 作息方案 ----
+function activeProfile(date){
+  const list = DB.profiles.slice().sort((a,b)=> a.startDate < b.startDate ? -1 : 1);
+  if (!list.length) return null;
+  const day = dateKey(startOfDay(date));
+  let cur = list[0];
+  list.forEach(p => { if (p.startDate <= day) cur = p; });
+  return cur;
+}
+function slotOf(profile, idx){ return profile.slots[idx-1] || null; }
+
+// ---- 有课时间 ----
+function busyBlocks(date){
+  const wd = weekdayOf(date);
+  const prof = activeProfile(date);
+  const list = [];
+  DB.courses.filter(c => Number(c.wd) === wd).forEach(c => {
+    if (!prof) return;
+    const a = slotOf(prof, Math.min(Number(c.s), Number(c.e)));
+    const b = slotOf(prof, Math.max(Number(c.s), Number(c.e)));
+    if (!a || !b) return;
+    const sub = [c.loc, c.teacher].filter(Boolean).join(' · ');
+    list.push({ s:a[0], e:Math.max(b[1], a[0]), title:c.name, sub:sub, course:true });
+  });
+  list.push({ s:710, e:810, title:'午饭 + 休息', sub:'饭点别硬塞单词', course:false });
+  list.push({ s:1050, e:1140, title:'晚饭 + 休息', sub:'', course:false });
+  return mergeBlocks(list);
+}
+
+function mergeBlocks(list){
+  const sorted = list.slice().sort((a,b)=> a.s - b.s);
+  const out = [];
+  sorted.forEach(b => {
+    const last = out[out.length-1];
+    if (last && b.s <= last.e){
+      last.e = Math.max(last.e, b.e);
+      if (last.title.indexOf(b.title) < 0) last.title += ' / ' + b.title;
+      if (b.sub && last.sub.indexOf(b.sub) < 0) last.sub = last.sub ? last.sub + ' · ' + b.sub : b.sub;
+      last.course = last.course || b.course;
+    } else {
+      out.push({ s:b.s, e:b.e, title:b.title, sub:b.sub, course:b.course });
+    }
+  });
+  return out;
+}
+
+// ---- 空档 ----
+function freeWindows(date){
+  const busy = busyBlocks(date);
+  const hasEarly = busy.some(b => b.course && b.s < 600);
+  const dayStart = hasEarly ? 480 : Math.max(480, Number(DB.settings.freeDayStart) || 630);
+  const dayEnd = Math.max(dayStart + 60, Number(DB.settings.latestEnd) || 1350);
+  const minWin = Math.max(10, Number(DB.settings.minWindow) || 45);
+  const wins = [];
+  let cursor = dayStart;
+  busy.forEach(b => {
+    // 上下课各留 10 分钟：课间要走教室，不是一打铃就能坐下学
+    const buffer = b.course ? 10 : 0;
+    const end = Math.min(b.s - buffer, dayEnd);
+    if (end > cursor) pushWindow(wins, cursor, end, hasEarly, minWin);
+    cursor = Math.max(cursor, b.e + buffer);
+  });
+  if (cursor < dayEnd) pushWindow(wins, cursor, dayEnd, hasEarly, minWin);
+  return wins.sort((a,b)=> a.s - b.s);
+}
+
+function pushWindow(wins, from, to, hasEarly, minWin){
+  if (to - from < minWin) return;
+  const q = evaluate(from, to, hasEarly);
+  wins.push({ s:from, e:to, level:q[0], note:q[1] });
+}
+
+function evaluate(s, e, hasEarly){
+  if (s >= 1100) return ['prime', '晚上最安静，适合背书和精听'];
+  if (s >= 780 && e <= 1080) return ['good', '下午整块，适合语法和听力'];
+  if (s < 720) return hasEarly ? ['good', '刚上完课，脑子还在状态'] : ['poor', '早上空档——你大概率在睡，别指望它'];
+  if (s >= 1020) return ['ok', '饭点前后，只能轻量复习'];
+  return ['ok', '零碎时间，背单词刚好'];
+}
+
+const LEVEL_TEXT = { prime:'黄金', good:'推荐', ok:'可用', poor:'勉强' };
+const LEVEL_COLOR = { prime:'var(--accent)', good:'var(--green)', ok:'var(--blue)', poor:'var(--sub)' };
+
+// ---- 任务模板 ----
+// MOJiTest 每天会按遗忘曲线推出「待复习」卡片。稳态下每天复习量约等于
+// 新词数 × 倍率，所以单词时间必须把复习算进去，否则计划一落地就崩。
+function wordLoad(){
+  const newD = Math.max(5, Number(DB.settings.dailyNew) || 30);
+  const factor = clamp(Number(DB.settings.reviewFactor) || 4, 1, 6);
+  let learned = 0;
+  Object.keys(DB.records).forEach(k => { learned += Math.max(0, Number(DB.records[k].words) || 0); });
+  const review = Math.min(learned, Math.round(newD * factor));
+  return {
+    newD: newD,
+    review: review,
+    newMin: clamp(Math.round(newD * 1.5), 20, 80),      // 约 90 秒一个生词
+    reviewMin: clamp(Math.round(review * 0.18), 8, 60)  // 约 11 秒一张复习卡
+  };
+}
+
+function templates(date){
+  const wd = weekdayOf(date);
+  const load = wordLoad();
+  const list = [];
+  if (wd === 7) list.push({ kind:'weeklyReview', title:'N3 查漏复盘',
+    detail:'N3 词汇抽查 30 分 · N3 语法抽查 30 分 · 本周错题 30 分', min:90 });
+  list.push({ kind:'newWords', title:'背新词 ' + load.newD + ' 个',
+    detail:'MOJiTest · N2 词汇完整版', min:load.newMin });
+  if (load.review > 0) {
+    list.push({ kind:'reviewWords', title:'清复习卡片 ' + load.review + ' 张',
+      detail:'MOJiTest 自动推送的待复习词，必须清零', min:load.reviewMin });
+  }
+  if (wd === 7) {
+    // 周日主项是复盘
+  } else if (wd === 6) {
+    list.push({ kind:'grammar', title:'语法 4 点 + 例句', detail:'新完全掌握 N2 文法', min:45 });
+    list.push({ kind:'listening', title:'精听 1 段', detail:'真题听力：听写 + 对照原文', min:35 });
+  } else {
+    list.push({ kind:'grammar', title:'语法 4 点 + 例句', detail:'新完全掌握 N2 文法', min:35 });
+    list.push({ kind:'listening', title:'精听 1 段', detail:'真题听力：听写 + 对照原文', min:25 });
+  }
+  return list;
+}
+
+const KIND_COLOR = { newWords:'var(--accent)', reviewWords:'var(--purple)',
+  grammar:'var(--blue)', listening:'var(--green)', weeklyReview:'var(--amber)' };
+
+function plan(date){
+  const wins = freeWindows(date);
+  const busy = busyBlocks(date);
+  const tpl = templates(date);
+  // 按时间先后用，但「早上你可能在睡」那一段永远排最后
+  const slots = wins.slice().sort((a,b)=>{
+    if (a.level === 'poor' && b.level !== 'poor') return 1;
+    if (b.level === 'poor' && a.level !== 'poor') return -1;
+    return a.s - b.s;
+  }).map(w => ({ start:w.s, end:w.e }));
+  const tasks = [], unscheduled = [];
+  // 一个任务整块塞进一个空档，不切碎（切碎必然剩 5 分钟这种垃圾时间）
+  tpl.forEach(t => {
+    let placed = false;
+    for (let i = 0; i < slots.length && !placed; i++) {
+      const avail = slots[i].end - slots[i].start;
+      if (avail < t.min) continue;
+      tasks.push({ kind:t.kind, title:t.title, detail:t.detail, start:slots[i].start, min:t.min });
+      slots[i].start += t.min;
+      placed = true;
+    }
+    if (!placed) unscheduled.push({ kind:t.kind, title:t.title, detail:t.detail, start:0, min:t.min });
+  });
+  tasks.sort((a,b)=> a.start - b.start);
+  return { windows:wins, tasks:tasks, busy:busy, unscheduled:unscheduled };
+}
+
+function levelRank(l){ return l === 'prime' ? 3 : l === 'good' ? 2 : l === 'ok' ? 1 : 0; }
+
+// ---- 词汇统计 ----
+function wordStats(today){
+  today = startOfDay(today || new Date());
+  const st = DB.settings;
+  const total = Math.max(1, Number(st.totalWords) || 4461);
+  const target = Math.max(1, Number(st.dailyNew) || 30);
+  let done = 0;
+  Object.keys(DB.records).forEach(k => { done += Math.max(0, Number(DB.records[k].words) || 0); });
+  const remaining = Math.max(0, total - done);
+  const rec = DB.records[dateKey(today)];
+  const todayWords = rec ? Math.max(0, Number(rec.words)||0) : 0;
+  const daysToDeadline = daysBetween(today, parseKey(st.wordDeadline));
+  const duePassed = daysToDeadline < 0;
+
+  const span = daysBetween(parseKey(st.startDate), today) + 1;
+  const win = clamp(span, 1, 14);
+  let sum = 0;
+  for (let i=0;i<win;i++){
+    const r = DB.records[dateKey(addDays(today, -i))];
+    if (r) sum += Math.max(0, Number(r.words)||0);
+  }
+  const rate = win > 0 ? sum/win : 0;
+
+  const planDays = Math.ceil(remaining/target);
+  const etaPlan = addDays(today, planDays);
+  const etaPace = rate > 0.05 ? addDays(today, Math.ceil(remaining/rate)) : null;
+  const daysLeft = Math.max(1, daysToDeadline);
+  const required = remaining/daysLeft;
+  const suggest = Math.max(target, Math.ceil(required));
+
+  let status;
+  if (remaining === 0) status = 'done';
+  else if (!duePassed && daysBetween(etaPlan, parseKey(st.wordDeadline)) >= 0) status = 'onTrack';
+  else if (required <= target*1.6) status = 'tight';
+  else status = 'behind';
+
+  return { total, done, remaining, todayWords, target, rate, etaPlan, etaPace,
+    required, daysToDeadline, duePassed, status, suggest,
+    percent: total>0 ? Math.min(1, done/total) : 0 };
+}
+
+function streak(today){
+  today = startOfDay(today || new Date());
+  let day = today, count = 0;
+  const w = k => { const r = DB.records[k]; return r ? Math.max(0, Number(r.words)||0) : 0; };
+  if (w(dateKey(day)) <= 0) day = addDays(day, -1);
+  while (w(dateKey(day)) > 0){ count++; day = addDays(day,-1); if (count > 4000) break; }
+  return count;
+}
+
+function recordedDays(){
+  return Object.keys(DB.records).filter(k => (Number(DB.records[k].words)||0) > 0).length;
+}
+function totalMinutes(){
+  let t = 0;
+  Object.keys(DB.records).forEach(k => { t += Math.max(0, Number(DB.records[k].minutes)||0); });
+  return t;
+}
+function recentBars(days){
+  const out = [];
+  const today = startOfDay(new Date());
+  for (let i = days-1; i >= 0; i--){
+    const d = addDays(today, -i);
+    const r = DB.records[dateKey(d)];
+    out.push({ key:dateKey(d), d:d, words: r ? Math.max(0, Number(r.words)||0) : 0 });
+  }
+  return out;
+}
+function sortedRecords(){
+  return Object.keys(DB.records).map(k => Object.assign({ key:k }, DB.records[k]))
+    .sort((a,b)=> a.key < b.key ? 1 : -1);
+}
+function isDone(kind, key){
+  const r = DB.records[key];
+  return !!(r && Array.isArray(r.done) && r.done.indexOf(kind) >= 0);
+}
+function setRecord(key, words, minutes, memo){
+  const r = DB.records[key] || { words:0, minutes:0, memo:'', done:[] };
+  r.words = Math.max(0, words|0);
+  r.minutes = Math.max(0, minutes|0);
+  r.memo = memo || '';
+  if (!Array.isArray(r.done)) r.done = [];
+  DB.records[key] = r;
+  saveDB();
+}
+function toggleTask(kind, key){
+  const r = DB.records[key] || { words:0, minutes:0, memo:'', done:[] };
+  if (!Array.isArray(r.done)) r.done = [];
+  const i = r.done.indexOf(kind);
+  if (i >= 0) r.done.splice(i,1); else r.done.push(kind);
+  DB.records[key] = r;
+  saveDB();
+}
+
+// ======================= UI =======================
+var state = { tab:'today', day: weekdayOf(new Date()) };
+
+function setTab(t){ state.tab = t; render(); window.scrollTo(0,0); }
+
+function render(){
+  const today = new Date();
+  const titles = { today:'今日', schedule:'课表', stats:'进度', settings:'设置' };
+  document.getElementById('title').textContent = titles[state.tab];
+  let sub = '';
+  if (state.tab === 'today'){
+    const dte = daysBetween(today, parseKey(DB.settings.examDate));
+    sub = (today.getMonth()+1)+'月'+today.getDate()+'日 '+WD_NAME[weekdayOf(today)-1]
+        + ' · ' + (dte >= 0 ? '距 N2 还有 ' + dte + ' 天' : '考试日期已过');
+  } else if (state.tab === 'schedule'){
+    const p = activeProfile(today);
+    sub = p ? '当前作息：' + p.name : '未设置作息方案';
+  } else if (state.tab === 'stats'){
+    sub = '截止 ' + DB.settings.wordDeadline;
+  } else {
+    sub = '数据只存在这台手机上';
+  }
+  document.getElementById('subtitle').textContent = sub;
+
+  const map = { today:viewToday, schedule:viewSchedule, stats:viewStats, settings:viewSettings };
+  document.getElementById('view').innerHTML = map[state.tab]();
+
+  ['today','schedule','stats','settings'].forEach(t => {
+    document.getElementById('tab-'+t).className = (state.tab === t ? 'on' : '');
+  });
+}
+
+// ---------- 通用 ----------
+function md(d){ return (d.getMonth()+1) + '月' + d.getDate() + '日'; }
+
+function attentionText(st){
+  if (st.duePassed) return '截止日已过，别再加新词。停新词，只做复习和真题。';
+  if (st.status === 'behind') return '按现在速度来不及。想赶上每天要背 ' + st.suggest + ' 词（现在 ' + st.target + '）。落后超过 10 天的量，就砍掉和 N3 重叠的词。';
+  if (st.status === 'tight') return '有点压线。每天 ' + st.target + ' 词别断，周末各补 15 词就能拉回来。';
+  return '节奏正常，保持就行。';
+}
+
+// 平均速度：从开始日到今天，总共学了多少 / 过了多少天（没学的日子也算进去）
+function avgPace(today){
+  today = startOfDay(today || new Date());
+  const st = wordStats(today);
+  const start = parseKey(DB.settings.startDate);
+  const days = Math.max(1, daysBetween(start, today) + 1);
+  const rate = st.done / days;
+  const remainDays = rate > 0.01 ? Math.ceil(st.remaining / rate) : null;
+  return { rate: rate, days: days, remainDays: remainDays, remaining: st.remaining };
+}
+
+// 迷你趋势（14 天）
+function sparkBars(bars, target, h){
+  h = h || 30;
+  const max = Math.max(target || 1, ...bars.map(b => b.words), 1);
+  let s = '<div style="display:flex;align-items:flex-end;gap:2px;height:' + h + 'px">';
+  bars.forEach(b => {
+    const hp = b.words <= 0 ? 2 : Math.max(3, Math.round(b.words / max * h));
+    const col = b.words <= 0 ? '#e6e4df' : (b.words >= target ? 'var(--green)' : 'var(--accent)');
+    s += '<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%">'
+      + '<i style="display:block;height:' + hp + 'px;background:' + col + ';border-radius:2px"></i></div>';
+  });
+  return s + '</div>';
+}
+
+// 进步曲线：实际累计 vs 计划线
+function curvePoints(days){
+  const today = startOfDay(new Date());
+  const start = parseKey(DB.settings.startDate);
+  const target = Math.max(1, Number(DB.settings.dailyNew) || 30);
+  const total = Math.max(1, Number(DB.settings.totalWords) || 4461);
+  const first = addDays(today, -(days - 1));
+  let running = 0;
+  Object.keys(DB.records).forEach(k => {
+    if (parseKey(k) < first) running += Math.max(0, Number(DB.records[k].words) || 0);
+  });
+  const pts = [];
+  for (let i = 0; i < days; i++) {
+    const d = addDays(first, i);
+    const r = DB.records[dateKey(d)];
+    if (r) running += Math.max(0, Number(r.words) || 0);
+    pts.push({ d: d, actual: running, planned: Math.min(total, target * Math.max(0, daysBetween(start, d) + 1)) });
+  }
+  return pts;
+}
+
+function svgCurve(pts){
+  const W = 300, H = 96, pad = 5;
+  const maxY = Math.max(1, ...pts.map(p => Math.max(p.actual, p.planned)));
+  const n = pts.length - 1 || 1;
+  const X = i => (pad + i * (W - 2 * pad) / n).toFixed(1);
+  const Y = v => (H - pad - (v / maxY) * (H - 2 * pad)).toFixed(1);
+  const path = key => pts.map((p, i) => (i ? 'L' : 'M') + X(i) + ' ' + Y(p[key])).join(' ');
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:' + H + 'px;display:block">'
+    + '<path d="' + path('planned') + '" fill="none" stroke="#cfcec9" stroke-width="1.5" stroke-dasharray="4 3"/>'
+    + '<path d="' + path('actual') + '" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>'
+    + '</svg>';
+}
+
+function paceSubText(pace, st){
+  if (pace.remainDays === null) {
+    return '平均 ' + pace.rate.toFixed(1) + ' 词/天 · 已过 ' + pace.days
+      + ' 天 · 按目标 ' + st.target + ' 词/天算 ' + md(st.etaPlan) + ' 完成';
+  }
+  return '平均 ' + pace.rate.toFixed(1) + ' 词/天 · 已过 ' + pace.days
+    + ' 天 · 预计 ' + md(paceEtaDate(pace)) + ' 完成';
+}
+
+function paceText(pace){
+  if (pace.remaining <= 0) {
+    return '单词全部背完 <b>' + pace.days + '</b> 天完成第一轮';
+  }
+  if (pace.remainDays === null) {
+    return '打卡一次就能算出<b>还需几天</b>';
+  }
+  return '按平均速度，完成计划还需 <b>' + pace.remainDays + '</b> 天';
+}
+
+// 预计完成日：有平均速度就按平均速度算，没有就按每日目标算
+function paceEtaDate(pace){
+  if (pace.remainDays === null) return null;
+  return addDays(startOfDay(new Date()), pace.remainDays);
+}
+
+// ---------- 今日 ----------
+function viewToday(){
+  const today = new Date();
+  const key = dateKey(today);
+  const p = plan(today);
+  const st = wordStats(today);
+  const load = wordLoad();
+  const bars = recentBars(14);
+  const pace = avgPace(today);
+  let h = '';
+
+  h += '<div class="card">'
+    + '<div class="row between" style="align-items:flex-start">'
+    +   '<div>'
+    +     '<div class="cap" style="margin:0 0 3px">N2 词汇完整版 · 绿宝 ' + st.total + ' 词</div>'
+    +     '<div><span class="big">' + st.done + '</span><span class="muted small"> / ' + st.total + ' 词</span></div>'
+    +   '</div>'
+    +   '<div style="text-align:right">'
+    +     '<div style="font-size:26px;font-weight:700;color:var(--accent);line-height:1.1">'
+    +       Math.round(st.percent*100) + '<span style="font-size:14px">%</span></div>'
+    +     '<div class="tiny muted">已完成</div>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="pbar"><i style="width:' + Math.max(1.5, st.percent*100).toFixed(1) + '%"></i></div>'
+    + '<div class="pace">' + paceText(pace) + '</div>'
+    + '<div class="pace-sub">' + paceSubText(pace, st) + '</div>'
+    + '<div class="sep"></div>'
+    + '<div class="metrics">'
+    +   '<div class="metric"><div class="k">今天新词</div><div class="v">' + st.todayWords + ' / ' + st.target + '</div></div>'
+    +   '<div class="metric"><div class="k">待复习卡片</div><div class="v">' + load.review + ' 张</div></div>'
+    +   '<div class="metric"><div class="k">剩余</div><div class="v">' + st.remaining + ' 词</div></div>'
+    + '</div>'
+    + '<div class="btnrow"><button class="primary" onclick="openRecord(\'' + key + '\',false)">'
+    + (st.todayWords > 0 ? '修改今天的新词数（已录 ' + st.todayWords + '）' : '录入今天的新词数')
+    + '</button></div>'
+    + '</div>';
+
+  h += '<div class="card"><h2>今天做什么</h2><div class="cap">共 ' + durText(p.tasks.reduce((a,b)=>a+b.min,0))
+    + ' · 按你的课表排的</div>';
+  if (!p.tasks.length) h += '<div class="empty">今天排不出任务，去课表看看空档是不是太短。</div>';
+  p.tasks.forEach(t => {
+    const done = isDone(t.kind, key);
+    h += '<div class="task ' + (done?'done':'') + '" onclick="toggleTask(\'' + t.kind + '\',\'' + key + '\');render()">'
+      + '<div class="ck">' + (done?'✓':'') + '</div>'
+      + '<div style="flex:1;min-width:0"><div class="tt">' + esc(t.title) + '</div>'
+      + '<div class="td">' + esc(t.detail) + '</div></div>'
+      + '<div class="tr"><div class="time" style="color:' + (KIND_COLOR[t.kind]||'var(--ink)') + '">'
+      + minsText(t.start) + '–' + minsText(t.start+t.min) + '</div>'
+      + '<div class="tiny muted">' + durText(t.min) + '</div></div></div>';
+  });
+  if (p.unscheduled.length){
+    const rest = p.unscheduled.reduce((a,b)=> a+b.min, 0);
+    h += '<div class="sep"></div><div class="warn">空档不够，还有 ' + rest + ' 分钟放不下。把每日新词降一点，或者砍掉听力。</div>';
+  }
+  h += '</div>';
+
+  if (st.status === 'behind' || st.status === 'tight' || st.duePassed){
+    h += '<div class="card"><h2>节奏提醒</h2><div class="small" style="line-height:1.65">'
+      + attentionText(st) + '</div></div>';
+  }
+
+  h += '<details class="sum"><summary>今天的空档（' + p.windows.length + ' 段 · 共 '
+    + durText(p.windows.reduce((a,w)=>a+(w.e-w.s),0)) + '）</summary><div style="padding-top:8px">';
+  if (!p.windows.length) h += '<div class="empty">今天没有可用空档。</div>';
+  p.windows.forEach(w => {
+    h += '<div class="lines"><div class="w">' + minsText(w.s) + '–' + minsText(w.e) + '</div>'
+      + '<span class="tag" style="color:' + LEVEL_COLOR[w.level] + ';background:' + LEVEL_COLOR[w.level] + '1f">'
+      + LEVEL_TEXT[w.level] + '</span>'
+      + '<span class="tiny muted" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+      + esc(w.note) + '</span><span class="tiny muted">' + durText(w.e-w.s) + '</span></div>';
+  });
+  if (p.busy.length){
+    h += '<div class="sep"></div><div class="tiny muted" style="font-weight:600;margin-bottom:2px">被占用的时间</div>';
+    p.busy.forEach(b => {
+      h += '<div class="lines"><div class="w muted">' + minsText(b.s) + '–' + minsText(b.e) + '</div>'
+        + '<span class="tiny muted" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+        + esc(b.title) + '</span></div>';
+    });
+  }
+  h += '</div></details>';
+  return h;
+}
+
+// ---------- 课表 ----------
+function viewSchedule(){
+  const today = startOfDay(new Date());
+  const delta = state.day - weekdayOf(today);
+  const date = addDays(today, delta);
+  const p = plan(date);
+  const courses = DB.courses.filter(c => Number(c.wd) === state.day)
+    .sort((a,b)=> Math.min(a.s,a.e) - Math.min(b.s,b.e));
+  const prof = activeProfile(date);
+  let h = '<div class="days">';
+  for (let i=1;i<=7;i++){
+    h += '<button class="' + (state.day===i?'on':'') + '" onclick="state.day=' + i + ';render()">'
+      + WD_SHORT[i-1] + '<span class="d">' + (i===weekdayOf(today)?'今天':'&nbsp;') + '</span></button>';
+  }
+  h += '</div><div style="height:12px"></div>';
+
+  h += '<div class="card"><div class="row between"><h2>' + WD_NAME[state.day-1] + '</h2>'
+    + '<button class="sm primary" onclick="openCourse(null)">+ 课程</button></div>'
+    + '<div class="cap">' + (prof ? esc(prof.name) : '未设置作息') + ' · 有课 ' + courses.length
+    + ' 门，空档 ' + p.windows.length + ' 段</div>';
+  p.busy.filter(b => b.course).forEach(b => {
+    h += '<div class="busy"><div class="t">' + minsText(b.s) + '–' + minsText(b.e) + '</div>'
+      + '<div class="n">' + esc(b.title) + '</div>'
+      + (b.sub ? '<div class="i">' + esc(b.sub) + '</div>' : '') + '</div>';
+  });
+  if (!courses.length) h += '<div class="empty">这天没课。</div>';
+  h += '<div class="sep"></div><div class="tiny muted" style="font-weight:600;margin-bottom:4px">空档</div>';
+  if (!p.windows.length) h += '<div class="empty">没有可用空档。</div>';
+  p.windows.forEach(w => {
+    h += '<div class="lines"><div class="w">' + minsText(w.s) + '–' + minsText(w.e) + '</div>'
+      + '<span class="tag" style="color:' + LEVEL_COLOR[w.level] + ';background:' + LEVEL_COLOR[w.level] + '1f">'
+      + LEVEL_TEXT[w.level] + '</span>'
+      + '<span class="tiny muted" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+      + esc(w.note) + '</span><span class="tiny muted">' + durText(w.e-w.s) + '</span></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="card"><h2>课程</h2><div class="cap">点课程修改</div>';
+  if (!courses.length) h += '<div class="empty">还没有课程，点上面「+ 课程」添加。</div>';
+  courses.forEach(c => {
+    const a = prof ? slotOf(prof, Math.min(c.s,c.e)) : null;
+    const b = prof ? slotOf(prof, Math.max(c.s,c.e)) : null;
+    const timeTxt = (a && b) ? minsText(a[0]) + '-' + minsText(b[1]) : '';
+    const pe = Math.min(c.s,c.e) === Math.max(c.s,c.e) ? '第' + c.s + '节' : '第' + Math.min(c.s,c.e) + '–' + Math.max(c.s,c.e) + '节';
+    h += '<div class="course" onclick="openCourse(\'' + c.id + '\')">'
+      + '<div class="row between"><div class="n">' + esc(c.name) + '</div>'
+      + '<div class="tiny muted">' + pe + '</div></div>'
+      + '<div class="i">' + (timeTxt ? timeTxt + ' · ' : '')
+      + esc([c.loc, c.teacher].filter(Boolean).join(' · ')) + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="card"><h2>作息时间方案</h2><div class="cap">课表的节次按这里换算成钟点，11 月 9 日自动换第①套</div>';
+  DB.profiles.slice().sort((a,b)=> a.startDate < b.startDate ? -1 : 1).forEach(pr => {
+    h += '<div class="course" onclick="openProfile(\'' + pr.id + '\')">'
+      + '<div class="row between"><div class="n">' + esc(pr.name) + '</div>'
+      + '<div class="tiny muted">›</div></div>'
+      + '<div class="i">' + pr.startDate + ' 起生效 · 共 ' + pr.slots.length + ' 节</div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+// ---------- 进度 ----------
+function viewStats(){
+  const st = wordStats(new Date());
+  const bars = recentBars(30);
+  const pts = curvePoints(30);
+  const last = pts[pts.length - 1];
+  const gap = last ? last.actual - last.planned : 0;
+  const C = 2 * Math.PI * 54;
+  const dash = (C * st.percent).toFixed(1);
+
+  const pace = avgPace(new Date());
+  let h = '<div class="card" style="text-align:center">'
+    + '<div style="position:relative;width:132px;height:132px;margin:4px auto 2px">'
+    + '<svg viewBox="0 0 132 132" style="width:132px;height:132px">'
+    + '<circle cx="66" cy="66" r="54" fill="none" stroke="#eeede9" stroke-width="11"/>'
+    + '<circle cx="66" cy="66" r="54" fill="none" stroke="var(--accent)" stroke-width="11" stroke-linecap="round"'
+    + ' stroke-dasharray="' + dash + ' ' + C.toFixed(1) + '" transform="rotate(-90 66 66)"/>'
+    + '</svg>'
+    + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+    + '<div style="font-size:26px;font-weight:700;line-height:1">' + Math.round(st.percent*100) + '%</div>'
+    + '<div class="tiny muted" style="margin-top:2px">' + st.done + ' / ' + st.total + '</div>'
+    + '</div></div>'
+    + '<div class="pace">' + paceText(pace) + '</div>'
+    + '<div class="pace-sub">' + paceSubText(pace, st) + '</div>'
+    + '<div class="row between" style="margin-top:10px">'
+    + '<div class="metric" style="text-align:left"><div class="k">剩余</div><div class="v">' + st.remaining + ' 词</div></div>'
+    + '<div class="metric"><div class="k">还需要</div><div class="v" style="color:'
+    + (st.required > st.target ? 'var(--accent)' : 'var(--green)') + '">' + st.required.toFixed(1) + ' 词/天</div></div>'
+    + '<div class="metric" style="text-align:right"><div class="k">距截止</div><div class="v">'
+    + (st.daysToDeadline >= 0 ? st.daysToDeadline + ' 天' : '已过 ' + (-st.daysToDeadline) + ' 天') + '</div></div>'
+    + '</div></div>';
+
+  h += '<div class="card"><h2>进步曲线</h2><div class="cap">红线是实际累计，灰虚线是按计划该到的位置</div>'
+    + svgCurve(pts)
+    + '<div class="row between tiny" style="margin-top:6px">'
+    + '<span class="muted">' + md(pts[0].d) + '</span>'
+    + '<span style="color:' + (gap >= 0 ? 'var(--green)' : 'var(--accent)') + ';font-weight:600">'
+    + (gap >= 0 ? '领先计划 ' + gap + ' 词' : '落后计划 ' + (-gap) + ' 词') + '</span>'
+    + '<span class="muted">' + md(last.d) + '</span>'
+    + '</div></div>';
+
+  h += '<div class="card"><h2>最近 30 天</h2><div class="cap">每天实际背的新词数，绿=达标</div>'
+    + sparkBars(bars, st.target, 88)
+    + '<div class="row between tiny muted" style="margin-top:4px"><span>' + md(bars[0].d)
+    + '</span><span>目标 ' + st.target + '</span><span>' + md(bars[bars.length-1].d) + '</span></div></div>';
+
+  h += '<div class="card"><h2>累计</h2><div class="metrics" style="margin-top:6px">'
+    + '<div class="metric"><div class="k">打卡天数</div><div class="v">' + recordedDays() + ' 天</div></div>'
+    + '<div class="metric"><div class="k">连续打卡</div><div class="v" style="color:var(--accent)">' + streak(new Date()) + ' 天</div></div>'
+    + '<div class="metric"><div class="k">总时长</div><div class="v">' + durText(totalMinutes()) + '</div></div>'
+    + '</div></div>';
+
+  h += '<div class="card"><div class="row between"><h2>历史记录</h2>'
+    + '<button class="sm" onclick="openRecord(\'' + dateKey(new Date()) + '\',true)">补记</button></div>'
+    + '<div class="cap" style="margin-top:4px">点一条可以改</div>';
+  const recs = sortedRecords();
+  if (!recs.length) h += '<div class="empty">还没有记录。</div>';
+  recs.slice(0,60).forEach(r => {
+    const d = parseKey(r.key);
+    h += '<div class="task" onclick="openRecord(\'' + r.key + '\',true)" style="cursor:pointer">'
+      + '<div style="flex:1;min-width:0"><div class="tt">' + (d.getMonth()+1) + '月' + d.getDate() + '日 '
+      + WD_NAME[weekdayOf(d)-1] + '</div>'
+      + (r.memo ? '<div class="td">' + esc(r.memo) + '</div>' : '') + '</div>'
+      + '<div class="tr"><div class="time" style="color:' + ((Number(r.words)||0)>0?'var(--ink)':'var(--sub)') + '">'
+      + (Number(r.words)||0) + ' 词</div>'
+      + ((Number(r.minutes)||0)>0 ? '<div class="tiny muted">' + durText(Number(r.minutes)) + '</div>' : '')
+      + '</div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+// ---------- 设置 ----------
+function viewSettings(){
+  const s = DB.settings;
+  const st = wordStats(new Date());
+  const load = wordLoad();
+  let h = '<div class="card"><h2>学习目标</h2><div class="cap">改了立刻重算</div>'
+    + '<div class="field"><label>词库总量（绿宝 4461）</label><input type="number" inputmode="numeric" value="' + s.totalWords + '" onchange="setSettingNum(\'totalWords\',this.value,500,20000)"></div>'
+    + '<div class="field"><label>每日新词</label><input type="number" inputmode="numeric" value="' + s.dailyNew + '" onchange="setSettingNum(\'dailyNew\',this.value,5,150)"></div>'
+    + '<div class="field"><label>每个新词对应多少复习卡（MOJiTest 推送量）</label>'
+    + '<input type="number" inputmode="numeric" value="' + (s.reviewFactor||4) + '" onchange="setSettingNum(\'reviewFactor\',this.value,1,6)"></div>'
+    + '<div class="hint">现在每天 ' + load.newD + ' 新词 + 约 ' + load.review + ' 张复习卡，单词合计约 '
+    + durText(load.newMin + load.reviewMin) + '。' + md(st.etaPlan) + ' 背完。</div></div>';
+
+  h += '<details class="sum"><summary>日期设置</summary><div style="padding-top:10px">'
+    + '<div class="field"><label>开始日期</label><input type="date" value="' + s.startDate + '" onchange="setSetting(\'startDate\',this.value)"></div>'
+    + '<div class="field"><label>考试日期</label><input type="date" value="' + s.examDate + '" onchange="setSetting(\'examDate\',this.value)"></div>'
+    + '<div class="field"><label>单词截止日</label><input type="date" value="' + s.wordDeadline + '" onchange="setSetting(\'wordDeadline\',this.value)"></div>'
+    + '</div></details>';
+
+  h += '<details class="sum"><summary>作息假定</summary><div style="padding-top:10px">'
+    + '<div class="field"><label>没早课几点起</label><input type="time" value="' + minsText(s.freeDayStart) + '" onchange="setSettingMinute(\'freeDayStart\',this.value)"></div>'
+    + '<div class="field"><label>最晚学到</label><input type="time" value="' + minsText(s.latestEnd) + '" onchange="setSettingMinute(\'latestEnd\',this.value)"></div>'
+    + '<div class="field"><label>最短可用空档（分钟，低于这个不排任务）</label><input type="number" inputmode="numeric" value="' + s.minWindow + '" onchange="setSettingNum(\'minWindow\',this.value,20,90)"></div>'
+    + '<div class="hint">没有早课的日子，早上那一整段会标成「你大概率在睡」，永远排在最后。</div>'
+    + '</div></details>';
+
+  h += '<div class="card"><h2>日历提醒</h2><div class="cap">网页不能在后台响，用 iPhone 日历代替</div>'
+    + '<div class="chips" style="margin-bottom:8px">'
+    + '<button class="' + (s.icsAlarm !== false ? 'on' : '') + '" onclick="setAlarm(true)">静音横幅</button>'
+    + '<button class="' + (s.icsAlarm === false ? 'on' : '') + '" onclick="setAlarm(false)">完全不提醒</button>'
+    + '</div>'
+    + '<div class="hint" style="margin-top:0;margin-bottom:10px">'
+    + (s.icsAlarm !== false
+        ? '到点弹一条通知，不出声。需要在 iPhone 设置 → 通知 → 日历 → 声音 关掉（一次设置永久有效），导出时也会再提醒你。'
+        : '只在日历里标记，不弹任何东西。适合你不想被打断、自己会打开 App 看的情况。')
+    + '</div>'
+    + '<button class="primary wide" onclick="exportICS()">生成日历文件（.ics）</button>'
+    + '<div class="hint">下载后点开 → 添加到日历。改了课表就重新导出一次。</div>'
+    + '<div class="btnrow"><button onclick="openReminder(null)">+ 新提醒</button></div>';
+  DB.reminders.forEach(r => {
+    const days = r.days.length === 7 ? '每天' : r.days.map(d=>WD_SHORT[d-1]).join(' ');
+    h += '<div class="course" style="padding:8px 0"><div class="row between">'
+      + '<div onclick="openReminder(\'' + r.id + '\')" style="flex:1;min-width:0">'
+      + '<div class="n">' + esc(r.title) + '</div>'
+      + '<div class="i">' + pad2(r.hour) + ':' + pad2(r.minute) + ' · ' + days + '</div></div>'
+      + '<button class="sm" onclick="toggleReminder(\'' + r.id + '\')">' + (r.enabled?'已开':'已关') + '</button>'
+      + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<details class="sum"><summary>数据备份与重置</summary><div style="padding-top:10px">'
+    + '<div class="btnrow"><button onclick="copyJSON()">复制备份</button>'
+    + '<button onclick="importJSON()">粘贴恢复</button></div>'
+    + '<div class="btnrow"><button onclick="resetRecords()">清空打卡记录</button>'
+    + '<button onclick="resetCourses()">恢复默认课表</button></div>'
+    + '<div class="hint">数据只存在这台手机上。换手机或删掉网站数据之前，先复制备份存到备忘录。</div>'
+    + '</div></details>';
+
+  h += '<div class="card"><h2>关于</h2><div class="hint" style="margin:0">'
+    + 'N2 计划 · 纯本地网页版<br>已记录 ' + recordedDays() + ' 天 · ' + durText(totalMinutes()) + '</div></div>';
+  return h;
+}
+
+function setAlarm(v){ DB.settings.icsAlarm = v; saveDB(); render(); }
+function setSetting(k, v){ DB.settings[k] = v; saveDB(); render(); }
+function setSettingNum(k, v, a, b){
+  DB.settings[k] = clamp(parseInt(v,10) || a, a, b); saveDB(); render();
+}
+function setSettingMinute(k, v){
+  const p = String(v).split(':');
+  if (p.length === 2) DB.settings[k] = clamp(parseInt(p[0],10)*60 + parseInt(p[1],10), 0, 1439);
+  saveDB(); render();
+}
+
+// ---------- 弹窗 ----------
+function openModal(html){
+  const m = document.getElementById('modal');
+  m.style.display = 'flex';
+  m.innerHTML = '<div class="sheet">' + html + '</div>';
+  m.onclick = function(e){ if (e.target === m) closeModal(); };
+}
+function closeModal(){
+  const m = document.getElementById('modal');
+  m.style.display = 'none'; m.innerHTML = ''; m.onclick = null;
+}
+
+// 打卡
+function openRecord(key, allowDate){
+  const r = DB.records[key] || { words: DB.settings.dailyNew, minutes: 60, memo:'', done:[] };
+  const d = parseKey(key);
+  let h = '<h3>打卡</h3>';
+  if (allowDate){
+    h += '<div class="field"><label>日期</label><input type="date" id="rec-date" value="' + key
+      + '" max="' + dateKey(new Date()) + '" onchange="recDateChange(this.value)"></div>';
+  } else {
+    h += '<div class="tiny muted" style="margin-bottom:10px">' + (d.getMonth()+1) + '月' + d.getDate()
+      + '日 ' + WD_NAME[weekdayOf(d)-1] + '</div>';
+  }
+  h += '<div class="field"><label>新词完成数量</label><input type="number" inputmode="numeric" id="rec-words" value="'
+    + (Number(r.words)||0) + '"></div>'
+    + '<div class="field"><label>学习时长（分钟）</label><input type="number" inputmode="numeric" id="rec-min" value="'
+    + (Number(r.minutes)||0) + '"></div>'
+    + '<div class="field"><label>备注（可选）</label><textarea id="rec-memo">' + esc(r.memo||'') + '</textarea></div>'
+    + '<div class="hint" style="margin-bottom:12px">填实际背了多少新词。剩余词数、预计完成日、落后天数都按这个算。</div>'
+    + '<div class="btnrow"><button onclick="closeModal()">取消</button>'
+    + '<button class="primary" onclick="saveRecord(\'' + key + '\')">保存</button></div>';
+  if (DB.records[key]){
+    h += '<div class="btnrow"><button style="color:var(--accent)" onclick="delRecord(\'' + key + '\')">删除这天的记录</button></div>';
+  }
+  openModal(h);
+}
+function recDateChange(v){ openRecord(v, true); }
+function saveRecord(key){
+  const w = parseInt(document.getElementById('rec-words').value,10) || 0;
+  const m = parseInt(document.getElementById('rec-min').value,10) || 0;
+  const memo = document.getElementById('rec-memo').value.trim();
+  setRecord(key, w, m, memo);
+  closeModal(); render();
+}
+function delRecord(key){
+  delete DB.records[key]; saveDB(); closeModal(); render();
+}
+
+// 课程
+function openCourse(id){
+  const c = id ? DB.courses.filter(x => x.id === id)[0] : null;
+  const cur = c || { name:'', wd:state.day, s:1, e:2, loc:'', teacher:'' };
+  let opts = '';
+  for (let i=1;i<=10;i++) opts += '<option value="' + i + '"' + (Number(cur.s)===i?' selected':'') + '>第'+i+'节</option>';
+  let opts2 = '';
+  for (let i=1;i<=10;i++) opts2 += '<option value="' + i + '"' + (Number(cur.e)===i?' selected':'') + '>第'+i+'节</option>';
+  let wds = '';
+  for (let i=1;i<=7;i++) wds += '<option value="' + i + '"' + (Number(cur.wd)===i?' selected':'') + '>'+WD_NAME[i-1]+'</option>';
+  const h = '<h3>' + (c?'修改课程':'添加课程') + '</h3>'
+    + '<div class="field"><label>课程名称</label><input id="c-name" value="' + esc(cur.name) + '" placeholder="例如：Java EE 企业级应用开发"></div>'
+    + '<div class="field"><label>星期</label><select id="c-wd">' + wds + '</select></div>'
+    + '<div class="field"><label>节次</label><div class="two"><select id="c-s">' + opts + '</select>'
+    + '<select id="c-e">' + opts2 + '</select></div></div>'
+    + '<div class="field"><label>地点（可选）</label><input id="c-loc" value="' + esc(cur.loc||'') + '"></div>'
+    + '<div class="field"><label>教师（可选）</label><input id="c-teacher" value="' + esc(cur.teacher||'') + '"></div>'
+    + '<div class="hint" style="margin-bottom:12px">连上两节就选第1–2节；周三是第9–10节。</div>'
+    + '<div class="btnrow"><button onclick="closeModal()">取消</button>'
+    + '<button class="primary" onclick="saveCourse(\'' + (c?c.id:'') + '\')">保存</button></div>'
+    + (c ? '<div class="btnrow"><button style="color:var(--accent)" onclick="delCourse(\'' + c.id + '\')">删除这门课</button></div>' : '');
+  openModal(h);
+}
+function saveCourse(id){
+  const name = document.getElementById('c-name').value.trim();
+  if (!name){ alert('课程名称不能为空'); return; }
+  let s = parseInt(document.getElementById('c-s').value,10);
+  let e = parseInt(document.getElementById('c-e').value,10);
+  if (e < s) e = s;
+  const obj = {
+    id: id || uid(), name: name,
+    wd: parseInt(document.getElementById('c-wd').value,10),
+    s: s, e: e,
+    loc: document.getElementById('c-loc').value.trim(),
+    teacher: document.getElementById('c-teacher').value.trim()
+  };
+  const i = DB.courses.findIndex(x => x.id === obj.id);
+  if (i >= 0) DB.courses[i] = obj; else DB.courses.push(obj);
+  saveDB(); closeModal(); render();
+}
+function delCourse(id){
+  DB.courses = DB.courses.filter(x => x.id !== id);
+  saveDB(); closeModal(); render();
+}
+
+// 作息方案
+function openProfile(id){
+  const p = DB.profiles.filter(x => x.id === id)[0];
+  if (!p) return;
+  let rows = '';
+  p.slots.forEach((sl, i) => {
+    rows += '<div class="field"><label>第 ' + (i+1) + ' 节</label><div class="two">'
+      + '<input type="time" data-idx="' + i + '" data-k="0" value="' + minsText(sl[0]) + '">'
+      + '<input type="time" data-idx="' + i + '" data-k="1" value="' + minsText(sl[1]) + '">'
+      + '</div></div>';
+  });
+  const h = '<h3>作息方案</h3>'
+    + '<div class="field"><label>方案名称</label><input id="p-name" value="' + esc(p.name) + '"></div>'
+    + '<div class="field"><label>生效起始日</label><input type="date" id="p-date" value="' + p.startDate + '"></div>'
+    + '<div class="hint" style="margin-bottom:10px">同一天有多套方案时，取生效日最近的那一套。左侧开始、右侧结束。</div>'
+    + rows
+    + '<div class="btnrow"><button onclick="closeModal()">取消</button>'
+    + '<button class="primary" onclick="saveProfile(\'' + p.id + '\')">保存</button></div>';
+  openModal(h);
+}
+function saveProfile(id){
+  const p = DB.profiles.filter(x => x.id === id)[0];
+  if (!p) return;
+  p.name = document.getElementById('p-name').value.trim() || '未命名方案';
+  p.startDate = document.getElementById('p-date').value;
+  const inputs = document.querySelectorAll('#modal input[type=time]');
+  inputs.forEach(el => {
+    const i = parseInt(el.getAttribute('data-idx'),10);
+    const k = parseInt(el.getAttribute('data-k'),10);
+    const parts = el.value.split(':');
+    if (parts.length === 2 && p.slots[i]) p.slots[i][k] = parseInt(parts[0],10)*60 + parseInt(parts[1],10);
+  });
+  // 修正结束早于开始的情况
+  p.slots.forEach(sl => { if (sl[1] <= sl[0]) sl[1] = Math.min(1440, sl[0] + 40); });
+  saveDB(); closeModal(); render();
+}
+
+// 提醒
+function openReminder(id){
+  const r = id ? DB.reminders.filter(x => x.id === id)[0] : null;
+  const cur = r || { title:'该背单词了', body:'打开 App 打卡，填今天背了多少新词。', hour:21, minute:30, days:[1,2,3,4,5,6,7], enabled:true };
+  let chips = '';
+  for (let i=1;i<=7;i++){
+    const on = cur.days.indexOf(i) >= 0;
+    chips += '<button class="' + (on?'on':'') + '" id="rd-' + i + '" onclick="toggleDay(' + i + ')">' + WD_SHORT[i-1] + '</button>';
+  }
+  const h = '<h3>' + (r?'修改提醒':'新提醒') + '</h3>'
+    + '<div class="field"><label>标题</label><input id="r-title" value="' + esc(cur.title) + '"></div>'
+    + '<div class="field"><label>内容</label><textarea id="r-body">' + esc(cur.body) + '</textarea></div>'
+    + '<div class="field"><label>时间</label><input type="time" id="r-time" value="' + pad2(cur.hour)+':'+pad2(cur.minute) + '"></div>'
+    + '<div class="field"><label>重复</label><div class="chips">' + chips + '</div></div>'
+    + '<div class="hint" style="margin-bottom:12px">选中的星期几在这个时间提醒。改完要重新「生成日历文件」才会生效。</div>'
+    + '<div class="btnrow"><button onclick="closeModal()">取消</button>'
+    + '<button class="primary" onclick="saveReminder(\'' + (r?r.id:'') + '\')">保存</button></div>'
+    + (r ? '<div class="btnrow"><button style="color:var(--accent)" onclick="delReminder(\'' + r.id + '\')">删除这条提醒</button></div>' : '');
+  openModal(h);
+}
+function toggleDay(i){
+  const el = document.getElementById('rd-' + i);
+  el.classList.toggle('on');
+}
+function saveReminder(id){
+  const days = [];
+  for (let i=1;i<=7;i++){
+    const el = document.getElementById('rd-' + i);
+    if (el.classList.contains('on')) days.push(i);
+  }
+  const t = document.getElementById('r-time').value.split(':');
+  const obj = {
+    id: id || uid(),
+    title: document.getElementById('r-title').value.trim() || '日语 N2',
+    body: document.getElementById('r-body').value.trim(),
+    hour: t.length===2 ? parseInt(t[0],10) : 21,
+    minute: t.length===2 ? parseInt(t[1],10) : 30,
+    days: days, enabled: true
+  };
+  const i = DB.reminders.findIndex(x => x.id === obj.id);
+  if (i >= 0){ obj.enabled = DB.reminders[i].enabled; DB.reminders[i] = obj; }
+  else DB.reminders.push(obj);
+  saveDB(); closeModal(); render();
+}
+function delReminder(id){
+  DB.reminders = DB.reminders.filter(x => x.id !== id);
+  saveDB(); closeModal(); render();
+}
+function toggleReminder(id){
+  const r = DB.reminders.filter(x => x.id === id)[0];
+  if (r){ r.enabled = !r.enabled; saveDB(); render(); }
+}
+
+// ---------- 日历导出 ----------
+const WD_CODE = {1:'MO',2:'TU',3:'WE',4:'TH',5:'FR',6:'SA',7:'SU'};
+function icsStamp(d){
+  return d.getUTCFullYear()+pad2(d.getUTCMonth()+1)+pad2(d.getUTCDate())+'T'
+    + pad2(d.getUTCHours())+pad2(d.getUTCMinutes())+pad2(d.getUTCSeconds())+'Z';
+}
+function icsLocal(d, h, m){
+  return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'T'+pad2(h)+pad2(m)+'00';
+}
+function icsEsc(s){
+  return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+}
+function fold(line){
+  // RFC5545 每行不超过 75 字节，中文按字节折
+  const enc = new TextEncoder();
+  if (enc.encode(line).length <= 73) return line;
+  let out = '', cur = '', n = 0;
+  for (const ch of line){
+    const len = enc.encode(ch).length;
+    if (n + len > 70){ out += cur + '\r\n '; cur = ch; n = len + 1; }
+    else { cur += ch; n += len; }
+  }
+  return out + cur;
+}
+function buildICS(){
+  const now = new Date();
+  const stamp = icsStamp(now);
+  const L = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//N2Planner//ZH//EN',
+             'CALSCALE:GREGORIAN','X-WR-CALNAME:N2 日语计划'];
+  DB.reminders.filter(r => r.enabled && r.days.length).forEach(r => {
+    L.push('BEGIN:VEVENT');
+    L.push(fold('UID:' + r.id + '-n2@local'));
+    L.push('DTSTAMP:' + stamp);
+    L.push(fold('DTSTART:' + icsLocal(now, r.hour, r.minute)));
+    L.push('DURATION:PT15M');
+    L.push('RRULE:FREQ=WEEKLY;BYDAY=' + r.days.map(d => WD_CODE[d]).join(','));
+    L.push(fold('SUMMARY:' + icsEsc(r.title)));
+    if (r.body) L.push(fold('DESCRIPTION:' + icsEsc(r.body)));
+    if (DB.settings.icsAlarm !== false) {
+      L.push('BEGIN:VALARM','TRIGGER:-PT5M','ACTION:DISPLAY',
+             fold('DESCRIPTION:' + icsEsc(r.title)),'END:VALARM');
+    }
+    L.push('END:VEVENT');
+  });
+  if (DB.settings.digestEnabled){
+    const todayWd = weekdayOf(now);
+    for (let wd = 1; wd <= 7; wd++){
+      const offset = (wd - todayWd + 7) % 7;
+      const day = addDays(now, offset);
+      const p = plan(day);
+      if (!p.tasks.length) continue;
+      const lines = p.tasks.map(t => minsText(t.start) + ' ' + t.title);
+      if (p.unscheduled.length) lines.push('空档不够，还有 ' + p.unscheduled.reduce((a,b)=>a+b.min,0) + ' 分钟塞不下');
+      L.push('BEGIN:VEVENT');
+      L.push(fold('UID:digest-' + wd + '-n2@local'));
+      L.push('DTSTAMP:' + stamp);
+      L.push(fold('DTSTART:' + icsLocal(day, DB.settings.digestHour, DB.settings.digestMinute)));
+      L.push('DURATION:PT10M');
+      L.push(fold('RRULE:FREQ=WEEKLY;BYDAY=' + WD_CODE[wd]));
+      L.push(fold('SUMMARY:' + icsEsc(WD_NAME[wd-1] + '的日语安排')));
+      L.push(fold('DESCRIPTION:' + icsEsc(lines.join('\n'))));
+      if (DB.settings.icsAlarm !== false) {
+        L.push('BEGIN:VALARM','TRIGGER:-PT5M','ACTION:DISPLAY',
+               fold('DESCRIPTION:' + icsEsc(WD_NAME[wd-1] + '该学日语了')),'END:VALARM');
+      }
+      L.push('END:VEVENT');
+    }
+  }
+  L.push('END:VCALENDAR');
+  return L.join('\r\n') + '\r\n';
+}
+function exportICS(){
+  const text = buildICS();
+  const blob = new Blob([text], { type:'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'N2学习提醒.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  const alarm = DB.settings.icsAlarm !== false;
+  openModal('<h3>日历文件已生成</h3>'
+    + '<div class="small" style="line-height:1.85"><b>1</b> 出现下载提示，点「下载」<br>'
+    + '<b>2</b> 打开「文件」App → 浏览 → 下载 → 点这个 .ics<br>'
+    + '<b>3</b> 选「添加到日历」→ 添加全部</div>'
+    + (alarm
+        ? '<div class="sep"></div><div class="small" style="line-height:1.85;color:var(--accent)">'
+          + '<b>不想听到声音（30 秒，一次设置永久有效）</b><br>'
+          + 'iPhone 设置 → 通知 → 日历 → 声音 → 关掉<br>'
+          + '之后再提醒就只是静音横幅，不会响铃</div>'
+        : '<div class="sep"></div><div class="small muted">当前选的是「完全不提醒」，导出的日历事件不会弹任何通知。</div>')
+    + '<div class="sep"></div>'
+    + '<div class="tiny muted" style="line-height:1.7">改了课表或提醒就重新导出一次。'
+    + '日历里会出重复项，先把「N2 日语计划」这个日历整个删掉再导入。</div>'
+    + '<div class="btnrow"><button class="primary" onclick="closeModal()">知道了</button></div>');
+}
+
+// ---------- 备份 ----------
+function copyJSON(){
+  const text = JSON.stringify(DB, null, 2);
+  const done = () => openModal('<h3>已复制</h3><div class="small">数据已复制到剪贴板，粘到备忘录里存着就行。</div>'
+    + '<div class="btnrow"><button class="primary" onclick="closeModal()">好</button></div>');
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ alert('复制失败，请手动复制'); }
+  document.body.removeChild(ta);
+}
+function importJSON(){
+  openModal('<h3>粘贴恢复</h3>'
+    + '<div class="field"><label>把之前备份的 JSON 粘进来</label><textarea id="imp" style="min-height:140px"></textarea></div>'
+    + '<div class="btnrow"><button onclick="closeModal()">取消</button>'
+    + '<button class="primary" onclick="doImport()">恢复</button></div>');
+}
+function doImport(){
+  const raw = document.getElementById('imp').value.trim();
+  if (!raw){ alert('没内容'); return; }
+  try{
+    const obj = JSON.parse(raw);
+    const base = seed();
+    DB = {
+      version:1,
+      settings: Object.assign({}, base.settings, obj.settings || {}),
+      profiles: Array.isArray(obj.profiles) && obj.profiles.length ? obj.profiles : base.profiles,
+      courses: Array.isArray(obj.courses) ? obj.courses : base.courses,
+      records: (obj.records && typeof obj.records === 'object') ? obj.records : {},
+      reminders: Array.isArray(obj.reminders) ? obj.reminders : base.reminders
+    };
+    saveDB(); closeModal(); render();
+    alert('已恢复');
+  }catch(e){ alert('JSON 格式不对：' + e.message); }
+}
+function resetRecords(){
+  if (confirm('清空所有打卡记录？不可恢复。')){ DB.records = {}; saveDB(); render(); }
+}
+function resetCourses(){
+  if (confirm('恢复默认课表和作息？会覆盖现在录的课程。')){
+    const s = seed();
+    DB.courses = s.courses; DB.profiles = s.profiles;
+    saveDB(); render();
+  }
+}
+
+// ---------- 启动 ----------
+render();
+
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
